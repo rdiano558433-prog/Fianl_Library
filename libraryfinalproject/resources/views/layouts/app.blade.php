@@ -1,3 +1,4 @@
+@extends('layouts.app')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,15 +42,13 @@
 
         {{-- Navigation --}}
         <nav class="flex-1 py-4 overflow-y-auto">
-            @php $role = auth()->user()->role; @endphp
-
-            @if($role === 'admin')
-                @include('layouts.partials.sidebar-admin')
-            @elseif($role === 'staff')
-                @include('layouts.partials.sidebar-staff')
-            @else
-                @include('layouts.partials.sidebar-user')
-            @endif
+           @if($role === 'admin')
+    @include('layouts.partials.sidebar-admin')
+@elseif($role === 'staff')
+    @include('layouts.partials.sidebar-staff')
+@else
+    @include('layouts.partials.sidebar-user')
+@endif
         </nav>
 
         {{-- Logout --}}
