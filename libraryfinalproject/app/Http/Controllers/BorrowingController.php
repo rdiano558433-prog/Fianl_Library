@@ -1,44 +1,48 @@
 <?php
 
-namespace App\Models;
+namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
+use App\Models\Borrowing;
+use App\Models\Book;
+use Illuminate\Http\Request;
 
-class Borrowing extends Model
+class BorrowingController extends Controller
 {
-    protected $fillable = [
-        'user_id',
-        'book_id',
-        'issued_by',
-        'status',
-        'borrowed_at',
-        'returned_at',
-        'due_date',
-    ];
-
-    public function user()
+    public function index()
     {
-        return $this->belongsTo(User::class);
+        $borrowings = Borrowing::with(['user', 'book'])->paginate(10);
+        return view('borrowings.index', compact('borrowings'));
     }
 
-    public function book()
+    public function create()
     {
-        return $this->belongsTo(Book::class);
+        $books = Book::where('available_copies', '>', 0)->get();
+        return view('borrowings.create', compact('books'));
     }
 
-    public function issuer()
+    public function store(Request $request)
     {
-        return $this->belongsTo(User::class, 'issued_by');
+        // Add logic to store borrowing
     }
 
-    /**
-     * Mark overdue borrowing records
-     */
-    public static function markOverdueRecords()
+    public function show(Borrowing $borrowing)
     {
-        Borrowing::where('status', 'borrowed')
-            ->where('due_date', '<', Carbon::now())
-            ->update(['status' => 'overdue']);
+        return view('borrowings.show', compact('borrowing'));
     }
+
+    public function returnBook(Borrowing $borrowing)
+    {
+        // Add logic to return book
+    }
+
+    public function borrow(Book $book)
+    {
+        // Add logic for user to borrow
+    }
+
+    public function myBooks()
+{
+    $borrowings = Borrowing::where('user_id', auth()->id())->paginate(10); // Add pagination
+    return view('user.my-books', compact('borrowings'));
+}
 }
