@@ -76,6 +76,7 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
 });
 
 // User Routes
+// User Routes
 Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', function () {
         $borrowings = \App\Models\Borrowing::with('book')
