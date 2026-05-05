@@ -41,8 +41,8 @@ class BorrowingController extends Controller
     }
 
     public function myBooks()
-    {
-        $borrowings = Borrowing::where('user_id', auth()->id())->get();
-        return view('user.my-books', compact('borrowings'));
-    }
+{
+    $borrowings = Borrowing::where('user_id', auth()->id())->paginate(10); // Add pagination
+    return view('user.my-books', compact('borrowings'));
+}
 }
