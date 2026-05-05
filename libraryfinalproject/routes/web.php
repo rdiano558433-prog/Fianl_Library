@@ -6,6 +6,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -51,17 +52,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 // Staff Routes
 Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
-    Route::get('/dashboard', function () {
-        \App\Models\Borrowing::markOverdueRecords();
-        $stats = [
-            'active_borrowings' => \App\Models\Borrowing::where('status', 'borrowed')->count(),
-            'overdue_count'     => \App\Models\Borrowing::where('status', 'overdue')->count(),
-            'total_books'       => \App\Models\Book::count(),
-            'returned_today'    => \App\Models\Borrowing::where('status', 'returned')->whereDate('return_date', today())->count(),
-        ];
-        $recentBorrowings = \App\Models\Borrowing::with(['user', 'book'])->latest()->take(10)->get();
-        return view('staff.dashboard', compact('stats', 'recentBorrowings'));
-    })->name('dashboard');
+    Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
     Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
