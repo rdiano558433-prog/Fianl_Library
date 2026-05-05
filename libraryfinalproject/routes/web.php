@@ -79,17 +79,25 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
 // User Routes
 Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', function () {
-        $borrowings = \App\Models\Borrowing::with('book')
-            ->where('user_id', auth()->id())
-            ->where('status', 'borrowed')
-            ->get();
-        $overdues = \App\Models\Borrowing::with('book')
-            ->where('user_id', auth()->id())
-            ->where('status', 'overdue')
-            ->get();
-        $history = \App\Models\Borrowing::with('book')
-            ->where('user_id', auth()->id())
-            ->latest()->take(5)->get();
+        $userId = auth()->id();
+
+$borrowings = \App\Models\Borrowing::with('book')
+    ->where('user_id', $userId)
+    ->where('status', 'borrowed')
+    ->limit(10)
+    ->get();
+
+$overdues = \App\Models\Borrowing::with('book')
+    ->where('user_id', $userId)
+    ->where('status', 'overdue')
+    ->limit(10)
+    ->get();
+
+$history = \App\Models\Borrowing::with('book')
+    ->where('user_id', $userId)
+    ->latest()
+    ->limit(5)
+    ->get();
         return view('user.dashboard', compact('borrowings', 'overdues', 'history'));
     })->name('dashboard');
 
@@ -101,5 +109,20 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
 
 // Add a generic dashboard route that redirects based on role
 Route::middleware(['auth'])->get('/dashboard', function () {
-    return redirect()->route(auth()->user()->role . '.dashboard');
+    $user = auth()->user();
+
+if (!$user) {
+    return redirect()->route('login');
+}
+
+switch ($user->role) {
+    case 'admin':
+        return redirect()->route('admin.dashboard');
+    case 'staff':
+        return redirect()->route('staff.dashboard');
+    case 'user':
+        return redirect()->route('user.dashboard');
+    default:
+        abort(403);
+}
 })->name('dashboard');
