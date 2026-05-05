@@ -1,3 +1,1 @@
 @include('books.create')
-
-        @php
