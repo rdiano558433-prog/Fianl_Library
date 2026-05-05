@@ -42,7 +42,8 @@
 
         {{-- Navigation --}}
         <nav class="flex-1 py-4 overflow-y-auto">
-           @if($role === 'admin')
+    @php $role = auth()->user()->role; @endphp
+    @if($role === 'admin')
     @include('layouts.partials.sidebar-admin')
 @elseif($role === 'staff')
     @include('layouts.partials.sidebar-staff')
