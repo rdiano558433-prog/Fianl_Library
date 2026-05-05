@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Borrowing extends Model
 {
@@ -29,5 +30,15 @@ class Borrowing extends Model
     public function issuer()
     {
         return $this->belongsTo(User::class, 'issued_by');
+    }
+
+    /**
+     * Mark overdue borrowing records
+     */
+    public static function markOverdueRecords()
+    {
+        Borrowing::where('status', 'borrowed')
+            ->where('due_date', '<', Carbon::now())
+            ->update(['status' => 'overdue']);
     }
 }
